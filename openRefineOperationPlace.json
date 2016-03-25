@@ -1,0 +1,550 @@
+[
+  {
+    "op": "core/column-addition",
+    "description": "Create column SplitPlace at index 2 based on column term using expression grel:value.split(\"--\")",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "newColumnName": "SplitPlace",
+    "columnInsertIndex": 2,
+    "baseColumnName": "term",
+    "expression": "grel:value.split(\"--\")",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column SplitPlace",
+    "columnName": "SplitPlace"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column Country at index 2 based on column term using expression grel:if(isBlank(value.split(\"--\")[1]),value,value.split(\"--\")[0])",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [
+            {
+              "v": {
+                "v": "Object does not have any field, including countryCode",
+                "l": "Object does not have any field, including countryCode"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "firstCountryCode Geonames",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "firstCountryCode Geonames"
+        }
+      ]
+    },
+    "newColumnName": "Country",
+    "columnInsertIndex": 2,
+    "baseColumnName": "term",
+    "expression": "grel:if(isBlank(value.split(\"--\")[1]),value,value.split(\"--\")[0])",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column City at index 2 based on column term using expression grel:if(isBlank(value.split(\"--\")[1]),\"\",value.split(\"--\")[1])",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [
+            {
+              "v": {
+                "v": "Object does not have any field, including countryCode",
+                "l": "Object does not have any field, including countryCode"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "firstCountryCode Geonames",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "firstCountryCode Geonames"
+        }
+      ]
+    },
+    "newColumnName": "City",
+    "columnInsertIndex": 2,
+    "baseColumnName": "term",
+    "expression": "grel:if(isBlank(value.split(\"--\")[1]),\"\",value.split(\"--\")[1])",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column City to position 3",
+    "columnName": "City",
+    "index": 3
+  },
+  {
+    "op": "core/column-addition-by-fetching-urls",
+    "description": "Create column Geonames Countrys at index 3 by fetching URLs based on column Country using expression grel:\"http://api.geonames.org/searchJSON?name=\" + escape(value, 'html') + \"&maxRows=10&username=gh.gherman\"",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [
+            {
+              "v": {
+                "v": "Object does not have any field, including countryCode",
+                "l": "Object does not have any field, including countryCode"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "firstCountryCode Geonames",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "firstCountryCode Geonames"
+        }
+      ]
+    },
+    "newColumnName": "Geonames Countrys",
+    "columnInsertIndex": 3,
+    "baseColumnName": "Country",
+    "urlExpression": "grel:\"http://api.geonames.org/searchJSON?name=\" + escape(value, 'html') + \"&maxRows=10&username=gh.gherman\"",
+    "onError": "set-to-blank",
+    "delay": 2500
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column Country Code at index 4 based on column Geonames Countrys using expression grel:forEach(value.parseJson().geonames,v,v.countryCode).join(\":::\").split(\":::\")[0]",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "value",
+          "selectBlank": true,
+          "selection": [
+            {
+              "v": {
+                "v": "Object does not have any field, including countryCode",
+                "l": "Object does not have any field, including countryCode"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "firstCountryCode Geonames",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "firstCountryCode Geonames"
+        }
+      ]
+    },
+    "newColumnName": "Country Code",
+    "columnInsertIndex": 4,
+    "baseColumnName": "Geonames Countrys",
+    "expression": "grel:forEach(value.parseJson().geonames,v,v.countryCode).join(\":::\").split(\":::\")[0]",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column Geonames Countrys",
+    "columnName": "Geonames Countrys"
+  },
+  {
+    "op": "core/column-addition-by-fetching-urls",
+    "description": "Create column Geonames place at index 5 by fetching URLs based on column City using expression grel:\"http://api.geonames.org/searchJSON?name=\" + escape(value, 'html') + \"&country=\" + escape(cells[\"Country Code\"].value, 'html') + \"&maxRows=10&username=gh.gherman\"",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "City",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "City"
+        },
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "Country Code",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "Country Code"
+        }
+      ]
+    },
+    "newColumnName": "Geonames place",
+    "columnInsertIndex": 5,
+    "baseColumnName": "City",
+    "urlExpression": "grel:\"http://api.geonames.org/searchJSON?name=\" + escape(value, 'html') + \"&country=\" + escape(cells[\"Country Code\"].value, 'html') + \"&maxRows=10&username=gh.gherman\"",
+    "onError": "set-to-blank",
+    "delay": 5000
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column GeonameID at index 6 based on column Geonames place using expression grel:forEach(value.parseJson().geonames,v,v.geonameId).join(\":::\").split(\":::\")[0]",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "City",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "City"
+        },
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "Country Code",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "Country Code"
+        }
+      ]
+    },
+    "newColumnName": "GeonameID",
+    "columnInsertIndex": 6,
+    "baseColumnName": "Geonames place",
+    "expression": "grel:forEach(value.parseJson().geonames,v,v.geonameId).join(\":::\").split(\":::\")[0]",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-addition-by-fetching-urls",
+    "description": "Create column GeonameID2 at index 3 by fetching URLs based on column Country using expression grel:\"http://api.geonames.org/searchJSON?name_equals=\" + escape(value, 'html') + \"&featureClass=\" + \"A\" + \"&maxRows=10&username=gh.gherman\"",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "City",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "City"
+        },
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "Country Code",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "Country Code"
+        }
+      ]
+    },
+    "newColumnName": "GeonameID2",
+    "columnInsertIndex": 3,
+    "baseColumnName": "Country",
+    "urlExpression": "grel:\"http://api.geonames.org/searchJSON?name_equals=\" + escape(value, 'html') + \"&featureClass=\" + \"A\" + \"&maxRows=10&username=gh.gherman\"",
+    "onError": "set-to-blank",
+    "delay": 5000
+  },
+  {
+    "op": "core/column-addition-by-fetching-urls",
+    "description": "Create column GeonameId3 at index 4 by fetching URLs based on column GeonameID2 using expression grel:forEach(value.parseJson().geonames,v,v.geonameId).join(\":::\").split(\":::\")[0]",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "City",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "City"
+        },
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "Country Code",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "Country Code"
+        }
+      ]
+    },
+    "newColumnName": "GeonameId3",
+    "columnInsertIndex": 4,
+    "baseColumnName": "GeonameID2",
+    "urlExpression": "grel:forEach(value.parseJson().geonames,v,v.geonameId).join(\":::\").split(\":::\")[0]",
+    "onError": "set-to-blank",
+    "delay": 5000
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column GeonameId3",
+    "columnName": "GeonameId3"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column GeonameId country at index 4 based on column GeonameID2 using expression grel:forEach(value.parseJson().geonames,v,v.geonameId)[0]",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": [
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "City",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "City"
+        },
+        {
+          "omitError": false,
+          "expression": "grel:isNonBlank(value)",
+          "selectBlank": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectError": false,
+          "invert": false,
+          "name": "Country Code",
+          "omitBlank": false,
+          "type": "list",
+          "columnName": "Country Code"
+        }
+      ]
+    },
+    "newColumnName": "GeonameId country",
+    "columnInsertIndex": 4,
+    "baseColumnName": "GeonameID2",
+    "expression": "grel:forEach(value.parseJson().geonames,v,v.geonameId)[0]",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-rename",
+    "description": "Rename column GeonameID2 to Geonames Country",
+    "oldColumnName": "GeonameID2",
+    "newColumnName": "Geonames Country"
+  },
+  {
+    "op": "core/column-rename",
+    "description": "Rename column GeonameId country to GeonameId2",
+    "oldColumnName": "GeonameId country",
+    "newColumnName": "GeonameId2"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column Geonames at index 5 based on column GeonameId2 using expression grel:if(isBlank(value), cells[\"GeonameID\"], value)",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "newColumnName": "Geonames",
+    "columnInsertIndex": 5,
+    "baseColumnName": "GeonameId2",
+    "expression": "grel:if(isBlank(value), cells[\"GeonameID\"], value)",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column Geonames Country",
+    "columnName": "Geonames Country"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column Geonames place",
+    "columnName": "Geonames place"
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column City to position 5",
+    "columnName": "City",
+    "index": 5
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column City to position 4",
+    "columnName": "City",
+    "index": 4
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column City to position 3",
+    "columnName": "City",
+    "index": 3
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column Country Code to position 5",
+    "columnName": "Country Code",
+    "index": 5
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column Country Code to position 4",
+    "columnName": "Country Code",
+    "index": 4
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column Country Code to position 3",
+    "columnName": "Country Code",
+    "index": 3
+  },
+  {
+    "op": "core/column-move",
+    "description": "Move column Geonames to position 5",
+    "columnName": "Geonames",
+    "index": 5
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column GeonameId2",
+    "columnName": "GeonameId2"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column GeonameID",
+    "columnName": "GeonameID"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column New at index 6 based on column Geonames using expression grel:value",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "newColumnName": "New",
+    "columnInsertIndex": 6,
+    "baseColumnName": "Geonames",
+    "expression": "grel:value",
+    "onError": "keep-original"
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column New using expression value.toString()",
+    "engineConfig": {
+      "mode": "row-based",
+      "facets": []
+    },
+    "columnName": "New",
+    "expression": "value.toString()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column Geonames",
+    "columnName": "Geonames"
+  }
+]
